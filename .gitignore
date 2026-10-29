@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# libs and helpers manually imported, like the Deluge Plugin helper script.
+*.external/
