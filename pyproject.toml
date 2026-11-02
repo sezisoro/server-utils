@@ -1,7 +1,0 @@
-[project]
-name = "deluge_hooks"
-version = "0.1.0"
-
-[project.scripts]
-export_on_complete = "deluge_hooks.export_on_complete:main"
-subtitle_formatter = "media_formatter.subtitle_formatter:main"
