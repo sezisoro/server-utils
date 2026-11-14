@@ -2,6 +2,10 @@
 
 Automation tools meant for Deluge, currently implemented via the Exporter plugin.
 
+## Installation
+
+`python3 -m pipx install -e .`
+
 ## Exporter
 
 Imagine this:
