@@ -20,12 +20,13 @@ more information on hook integration.
 
 import argparse
 import logging
+import logging.handlers
 import os
 import shutil
 from pathlib import Path
 from sys import exit
 
-from libs.mediatype import MediaType
+from deluge_exporter.mediatype import MediaType
 
 LOGGER = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ parser.add_argument(
 parser.add_argument(
     "-l",
     "--log_to_syslog",
-    default=None,
+    default=False,
     action="store_true",
     help="Log to syslog instead of STDOUT/STDERR; useful for debugging automation",
 )
@@ -95,12 +96,10 @@ def main(args):
     else:
         log_level = logging.DEBUG
 
-    if args.logfile is not None:
-        logging.basicConfig(
-            level=log_level, filename="/var/log/deluge_exporter_hook.log"
-        )
-    else:
-        logging.basicConfig(level=log_level)
+    logging.basicConfig(level=log_level)
+
+    if args.log_to_syslog:
+        LOGGER.addHandler(logging.handlers.SysLogHandler("/var/run/syslog"))
 
     if args.dry_run:
         LOGGER.info("Running in dry-run mode...")

@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from pyfakefs.fake_filesystem import FakeFilesystem
 
-from libs.mediatype import MediaType
+from deluge_exporter.mediatype import MediaType
 
 
 @pytest.mark.parametrize(

@@ -3,20 +3,21 @@ build-backend = "uv_build"
 requires = [ "uv-build>=0.13.6,<0.14" ]
 
 [project]
-name = "libs"
+name = "deluge-exporter"
 version = "0.1.0"
-description = "Mostly media classification libs"
+description = "Hooks for Deluge Exporter plugin + libs"
 readme = "README.md"
 authors = [ { name = "sez", email = "sezisoro@gmail.com" } ]
 requires-python = ">=3.13"
 classifiers = [
+  "Private :: Do Not Upload",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3.15",
 ]
 dependencies = []
-scripts.exporter = "scripts:deluge_hook_exporter"
+scripts.exporter = "deluge_exporter:exporter"
 
 [dependency-groups]
 dev = [
