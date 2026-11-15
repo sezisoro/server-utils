@@ -189,6 +189,11 @@ class MediaType(Enum):
                 else:
                     type_counts[mediatype] = 1
 
+        if len(type_counts) == 0:
+            LOGGER.error(
+                "No valid files found. Check permissions or ignored suffixes list."
+            )
+
         # If only one MediaType
         if len(type_counts) == 1:
             LOGGER.debug(f"Is a uniform tree: {filetree}")

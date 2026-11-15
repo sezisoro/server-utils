@@ -2,20 +2,8 @@
 
 """Categorizes & hardlinks completed downloads to export directory for triage.
 
-Problem-to-Solve is to keep seeding and also tag, organize and import media on
-completion without duplicating space. To automate process without keeping track
-of what has been imported, what is ready to be deleted, deluge can call this
-program on download complete and delete the original on seeding complete (if
-ever).
-
-Deluge Execute plugin expected to call this file with three positional arguments:
-
-    export_on_complete.py <torrent_id> <torrent_name> <torrent_path>
-
-In this program, the first two positional arguments are never used.
-
-See the [Deluge Execute docs](https://deluge-torrent.org/plugins/execute/) for
-more information on hook integration.
+Guesses media category from suffixes & filepaths, and hardlinks given path to
+categorized export directory.
 """
 
 import argparse
@@ -38,25 +26,34 @@ EXPORT_DIRECTORY = "/sb1/xfer/xport/"
 
 
 def main(args=None):
-    __usage__ = "deluge_exporter torrent_id torrent_name torrent_path"
+    __usage__ = "deluge_exporter [-l] [-dv] input [--output]"
     parser = argparse.ArgumentParser(description=__usage__)
     parser.add_argument(
-        "torrent_id",
+        "input",
         default=None,
         type=str,
-        help="ID for interacting with torrents via the Deluge RPC API",
+        help="Path to media root to be classified",
     )
     parser.add_argument(
-        "torrent_name",
+        "-o",
+        "--output",
         default=None,
         type=str,
-        help="Name of torrent",
+        help="If set, skip classification and link directly to this path",
     )
     parser.add_argument(
-        "torrent_path",
-        default=None,
-        type=str,
-        help="Path to torrent file or root directory",
+        "-l",
+        "--log_to_syslog",
+        default=False,
+        action="store_true",
+        help="Log to syslog (journal) instead of STDOUT/STDERR",
+    )
+    parser.add_argument(
+        "-d",
+        "--dry_run",
+        action="store_true",
+        default=False,
+        help="Enable debug mode; perform no modifications",
     )
     parser.add_argument(
         "-v",
@@ -64,26 +61,6 @@ def main(args=None):
         action="count",
         default=0,
         help="Enable verbose output",
-    )
-    parser.add_argument(
-        "--dry_run",
-        action="store_true",
-        default=False,
-        help="Enable debug mode; perform no modifications",
-    )
-    parser.add_argument(
-        "-l",
-        "--log_to_syslog",
-        default=False,
-        action="store_true",
-        help="Log to /var/log/deluge_exporter.log instead of STDOUT/STDERR; useful for debugging automation",
-    )
-    parser.add_argument(
-        "-d",
-        "--destination",
-        default=None,
-        type=str,
-        help="Ignore inferred destination and hardlink to supplied directory",
     )
     parsed_args = parser.parse_args(args)
 
@@ -105,12 +82,8 @@ def main(args=None):
     if parsed_args.dry_run:
         LOGGER.info("Running in dry-run mode...")
 
-    LOGGER.info(
-        f"Torrent ID: {parsed_args.torrent_id} Torrent Name: {parsed_args.torrent_name} Torrent Path: {parsed_args.torrent_path}"
-    )
-
     # Safeguard in case the deluge plugin gets misconfigured
-    source_path = Path(parsed_args.torrent_path)
+    source_path = Path(parsed_args.input)
     inbox_path = Path(COMPLETED_DIRECTORY)
     if not Path(
         os.path.commonpath([source_path.resolve(), inbox_path.resolve()])
@@ -118,8 +91,8 @@ def main(args=None):
         LOGGER.error(f"Torrent isn't complete (not in {inbox_path}):  {source_path}")
         return 1
 
-    if parsed_args.destination is not None:
-        destination_path = Path(parsed_args.destination).resolve()
+    if parsed_args.output is not None:
+        destination_path = Path(parsed_args.output).resolve()
         if not (destination_path.exists() and destination_path.is_dir()):
             LOGGER.error(f"Overridden destination invalid: {destination_path}")
             return 1
