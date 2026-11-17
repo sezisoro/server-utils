@@ -14,13 +14,9 @@ import shutil
 from pathlib import Path
 from sys import exit
 
-from deluge_exporter.mediatype import MediaType
+from media_tools.mediatype import MediaType
 
 LOGGER = logging.getLogger(__name__)
-
-# Used to double check the file is complete
-# TODO: use deluge RPC API to check torrent state instead
-COMPLETED_DIRECTORY = "/sb1/xfer/deluge/complete/"
 
 EXPORT_DIRECTORY = "/sb1/xfer/xport/"
 
@@ -82,15 +78,7 @@ def main(args=None):
     if parsed_args.dry_run:
         LOGGER.info("Running in dry-run mode...")
 
-    # Safeguard in case the deluge plugin gets misconfigured
     source_path = Path(parsed_args.input)
-    inbox_path = Path(COMPLETED_DIRECTORY)
-    if not Path(
-        os.path.commonpath([source_path.resolve(), inbox_path.resolve()])
-    ).samefile(inbox_path):
-        LOGGER.error(f"Torrent isn't complete (not in {inbox_path}):  {source_path}")
-        return 1
-
     if parsed_args.output is not None:
         destination_path = Path(parsed_args.output).resolve()
         if not (destination_path.exists() and destination_path.is_dir()):

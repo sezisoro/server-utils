@@ -191,8 +191,10 @@ class MediaType(Enum):
 
         if len(type_counts) == 0:
             LOGGER.error(
-                "No valid files found. Check permissions or ignored suffixes list."
+                f"Filetree {filetree} empty, or all files are ignored."
+                "\nCheck permissions or ignored suffixes list."
             )
+            return MediaType.Unknown
 
         # If only one MediaType
         if len(type_counts) == 1:

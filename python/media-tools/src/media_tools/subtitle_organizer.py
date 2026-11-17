@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*- (PEP 263)
 #
 # subtitle_filename_uniformity.py - Renames and moves subtitles to match found related video
 # companion.
@@ -106,13 +105,14 @@
 
 import argparse
 import logging
-import sys
 import re
+import sys
 from pathlib import Path
 
-
 __version__ = "0.1.0"
-__usage__ = "subtitle_filename_uniformity.py [--dry_run] [-rv] [--unsafe_matcher] dir1 dir2"
+__usage__ = (
+    "subtitle_filename_uniformity.py [--dry_run] [-rv] [--unsafe_matcher] dir1 dir2"
+)
 
 logger = logging.getLogger(__name__)
 
@@ -318,7 +318,7 @@ def get_language_code(filepath: Path) -> str | None:
                 if user_input == "e":
                     return ".eng"
                 elif user_input == "i":
-                    return f".{input("Enter language code:\n➜ ")}"
+                    return f".{input('Enter language code:\n➜ ')}"
                 elif user_input == "u":
                     return ""
                 elif user_input == "c":
@@ -334,19 +334,19 @@ def get_language_code(filepath: Path) -> str | None:
                         with open(filepath, mode="r") as file:
                             for _ in range(20):
                                 print(file.readline())
-                    except UnicodeDecodeError as e:
+                    except UnicodeDecodeError:
                         try:
                             with open(filepath, mode="r", encoding="ascii") as file:
                                 for _ in range(20):
                                     print(file.readline())
-                        except UnicodeDecodeError as e:
+                        except UnicodeDecodeError:
                             try:
                                 with open(
                                     filepath, mode="r", encoding="latin_1"
                                 ) as file:
                                     for _ in range(20):
                                         print(file.readline())
-                            except UnicodeDecodeError as e:
+                            except UnicodeDecodeError:
                                 logger.error(
                                     f"coudn't open subtitle file '{filepath}' as utf-8, ASCII, or Latin-1; giving up."
                                 )
@@ -500,7 +500,9 @@ def main(args):
         for directory in args.directories:
             directory = directory.rstrip()
             logger.debug(f"Scanning location '{directory}'...")
-            leftovers: list[Path] = recursive_rename_subtitles(Path(directory).resolve(), args.recursive)
+            leftovers: list[Path] = recursive_rename_subtitles(
+                Path(directory).resolve(), args.recursive
+            )
             if leftovers:
                 logger.warning(f"Failed to process {len(leftovers)} files: {leftovers}")
                 return 1
@@ -510,7 +512,9 @@ def main(args):
         for directory in args.infile:
             directory = directory.rstrip()
             logger.debug(f"Scanning location '{directory}'...")
-            leftovers: list[Path] = recursive_rename_subtitles(Path(directory).resolve(), args.recursive)
+            leftovers: list[Path] = recursive_rename_subtitles(
+                Path(directory).resolve(), args.recursive
+            )
             if leftovers:
                 logger.warning(f"Failed to process {len(leftovers)} files: {leftovers}")
                 return 1

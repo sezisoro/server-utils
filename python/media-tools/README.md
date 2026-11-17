@@ -1,12 +1,12 @@
-# deluge-hooks
+# media-tools
 
-Automation tools meant for Deluge, currently implemented via the Exporter plugin.
+Automation tools for downloading, organizing & tagging media via CLI
 
 ## Installation
 
 `python3 -m pipx install -e .`
 
-## Exporter
+## media_organizer
 
 Imagine this:
 
@@ -20,19 +20,19 @@ Imagine this:
  triaged yet
 
 Instead of manually tracking what is ready for linking or deleting, always link
-on download complete, always delete original on torrent complete.
+on download complete, always delete original on seeding complete.
 
-The Deluge Execute plugin can trigger on these events. It is expected to call
-`./src/scripts/deluge_hook_exporter.py` with three positional arguments:
+The Deluge Execute plugin can trigger on these events. It is expected to call a
+shell wrapper script with three arguments: `<torrent_id>` `<torrent_name>`
+`<torrent_path>`. That script will call `organize_media` with `<torrent_path>`
+so that the python script is still usable for ad-hoc runs.
 
-    export_on_complete.py <torrent_id> <torrent_name> <torrent_path>
+See the [Deluge Execute docs](https://deluge-torrent.org/plugins/execute/) for
+more information on hook integration. Unfortunately **it seems the Execute
+plugin is broken, so all this is for nought**. Everntually I'll switch back to
+`qbittorrent` and deal with the issues that comes with that software.
 
-See the [Deluge Execute docs](https://deluge-torrent.org/plugins/execute/) for more information on hook integration.
-
-The file is called exporter because the files are being 'exported' from Deluge,
-maybe it should be 'triage' or something.
-
-Anyway the program attempts to classify all files based on extensions (or
+Anyway the program attempts to classify all files based on extensions (the
 suffix from `pathlib.Path.suffix`), and then classify the whole download based
 on what mediatypes are most common. If 70% are of one type, stamp the whole
 thing as that type and then link it to the corresponding directory. The idea is
